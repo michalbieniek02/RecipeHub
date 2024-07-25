@@ -1,6 +1,6 @@
 'use client';
 import { useState } from "react";
-import { string, z, ZodError } from "zod";
+import { z, ZodError } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -8,10 +8,8 @@ import Food from "../../public/food.webp";
 import { fetchRecipes, fetchRecipeById  } from '../../utils/fetchRecipes';
 import {
     Sheet,
-    SheetClose,
     SheetContent,
     SheetDescription,
-    SheetFooter,
     SheetHeader,
     SheetTitle,
     SheetTrigger,
@@ -240,48 +238,24 @@ export default function Page() {
               <img className='min-w-[400px] rounded-md' src={recipe.image} alt={recipe.title} />
               <div className="min-w-[90%] rounded-md bg-gray-100 shadow-md ml-4 p-2">
               <h2>{recipe.title}</h2>
-              <button onClick={()=>openModal(recipe.id)}>Jebac swinie</button>
+              <button className="px-3 bg-white rounded-md border:white active:border-black border-solid border-2 " onClick={()=>openModal(recipe.id)}>Select</button>
               </div>
             </li>
           ))}
         </ul>
       )}
     </div>
-   {/* <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
-        {selectedRecipe && (
-          <div>
-            <h2>{selectedRecipe.title}</h2>
-            <img src={selectedRecipe.image} alt={selectedRecipe.title} />
-            <p>{selectedRecipe.summary}</p>
-            <h3>Ingredients</h3>
-            <ul>
-              {selectedRecipe.ingredients?.map((ingredient, index) => (
-                <li key={index}>{`${ingredient.amount} ${ingredient.name}`}</li>
-              ))}
-            </ul>
-            <h3>Instructions</h3>
-            <ul>
-              {selectedRecipe.instructions?.map((instruction, index) => (
-                <li key={index}>{instruction}</li>
-              ))}
-            </ul>
-            <button onClick={closeModal}>Close</button>
-          </div>
-        )}
-      </Modal> */}
+   
       <Sheet>
       <SheetTrigger asChild>
         <Button className="fixed right-0 top-3 z-50" variant="outline">Directions</Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="text-xl px-10">
         <SheetHeader>
-          <SheetTitle>{selectedRecipe?.title? selectedRecipe.title :"Choose your meal first!"}</SheetTitle>
-          <SheetDescription>
-            
-          </SheetDescription>
+          <SheetTitle className="text-2xl text-purple-500 text-center my-10">{selectedRecipe?.title? selectedRecipe.title :"Choose your meal first!"}</SheetTitle>
         </SheetHeader>
         <div className="chuj">
-            <div>{ingredients}</div>
+            <div>{}</div>
             <div dangerouslySetInnerHTML={{ __html: instructions || '' }}></div>
         </div>
       </SheetContent>
