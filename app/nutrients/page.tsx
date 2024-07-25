@@ -236,7 +236,7 @@ export default function Page() {
           {recipes.map((recipe) => (
             <li className="flex py-2 " key={recipe.id}>
               <img className='min-w-[400px] rounded-md' src={recipe.image} alt={recipe.title} />
-              <div className="min-w-[90%] rounded-md bg-gray-100 shadow-md ml-4 p-2">
+              <div className="min-w-[90%] rounded-md bg-gray-100 shadow-md ml-4 p-2 pt-24">
               <h2>{recipe.title}</h2>
               <button className="px-3 bg-white rounded-md border:white active:border-black border-solid border-2 " onClick={()=>openModal(recipe.id)}>Select</button>
               </div>
@@ -250,7 +250,7 @@ export default function Page() {
       <SheetTrigger asChild>
         <Button className="fixed right-0 top-3 z-50" variant="outline">Directions</Button>
       </SheetTrigger>
-      <SheetContent className="text-xl px-10">
+      <SheetContent className="text-xl px-10 overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="text-2xl text-purple-500 text-center my-10">{selectedRecipe?.title? selectedRecipe.title :"Choose your meal first!"}</SheetTitle>
         </SheetHeader>
