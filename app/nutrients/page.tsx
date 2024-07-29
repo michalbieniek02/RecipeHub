@@ -9,7 +9,6 @@ import { fetchRecipes, fetchRecipeById  } from '../../utils/fetchRecipes';
 import {
     Sheet,
     SheetContent,
-    SheetDescription,
     SheetHeader,
     SheetTitle,
     SheetTrigger,
@@ -32,28 +31,29 @@ interface Recipe {
 }
 
 const nutrientSchema = z.object({
-    protein: z.object({
-        min: z.number().nonnegative("Protein min can't be 0"),
-        max: z.number().nonnegative("Protein max can't be 0"),
+  protein: z.object({
+    min: z.preprocess((val:any) => parseFloat(val), z.number().nonnegative("Protein min can't be 0")),
+    max: z.preprocess((val:any) => parseFloat(val), z.number().nonnegative("Protein max can't be 0")),
   }).refine(data => data.min <= data.max, {
-      message: "Protein min should be less than or equal to Protein max",
-      path: ["protein"],
+    message: "Protein min should be less than or equal to Protein max",
+    path: ["protein"],
   }),
   fat: z.object({
-    min: z.number().nonnegative("Fat min can't be 0"),
-    max: z.number().nonnegative("Fat max can't be 0"),
-}).refine(data => data.min <= data.max, {
+    min: z.preprocess((val:any) => parseFloat(val), z.number().nonnegative("Fat min can't be 0")),
+    max: z.preprocess((val:any) => parseFloat(val), z.number().nonnegative("Fat max can't be 0")),
+  }).refine(data => data.min <= data.max, {
     message: "Fat min should be less than or equal to Fat max",
     path: ["fat"],
   }),
   carbs: z.object({
-    min: z.number().nonnegative("Carbs min can't be 0"),
-    max: z.number().nonnegative("Carbs max can't be 0"),
-}).refine(data => data.min <= data.max, {
+    min: z.preprocess((val:any) => parseFloat(val), z.number().nonnegative("Carbs min can't be 0")),
+    max: z.preprocess((val:any) => parseFloat(val), z.number().nonnegative("Carbs max can't be 0")),
+  }).refine(data => data.min <= data.max, {
     message: "Carbs min should be less than or equal to Carbs max",
     path: ["carbs"],
   }),
 });
+
 
 type NutrientFormData = z.infer<typeof nutrientSchema>;
 type Errors = Record<string, string>;
@@ -61,12 +61,13 @@ type Errors = Record<string, string>;
 export default function Page() {
     const [formState,setFormState] = useState({
         proteinMin:0,
-        proteinMax:0,
+        proteinMax:997,
         fatMin:0,
-        fatMax:0,
+        fatMax:997,
         carbMin:0,
-        carbMax:0
+        carbMax:997
     })
+  
     
     const [errors, setErrors] = useState<Errors>({});
     const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -74,14 +75,12 @@ export default function Page() {
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
     const [instructions, setInstructions] = useState<string[]>([]);
+    
 
     const openModal = async (recipeId: number) => {
         const recipe = await fetchRecipeById(recipeId);
         setSelectedRecipe(recipe);
-        console.log(recipe.title);
-        console.log(recipe.ingredients);
         setIngredients(recipe.ingredients||[])
-        console.log(recipe.instructions);
         setInstructions(recipe.instructions||[])
         
       };
@@ -127,20 +126,23 @@ export default function Page() {
   };
 
   return (
-    <main className="grid grid-cols-1 xl:grid-cols-2 px-[10%] md:px-[20%] lg:px-[30%] text-center xl:text-start justify-center items-center pt-[100px]">
-      <div className="list-item list-none">
-        <h1 className="text-7xl mr-10">Nutrients</h1>
-        <p className="text-xl mb-[25px]">find dishes with specified macros</p>
+    <main>
+      <div className="grid grid-cols-1 xl:grid-cols-2 xl:gap-10 px-[10%] md:px-[20%]  lg:px-[25%] text-center xl:text-start justify-center items-center "> 
+      <div className="list-item list-none mt-[200px]">
+        <h1 className="text-5xl sm:text-7xl"> Nutrients</h1>
+        <p className="text-xl sm:mb-[25px]">find dishes with specified macros</p>
       </div>
-      <form onSubmit={handleSubmit}>
+      <form className="mt-10 md:mt-[150px]" onSubmit={handleSubmit}>
         <div className="flex flex-wrap lg:flex-nowrap gap-8 justify-center xl:justify-normal text-center">
-          <div className="list-items">
-            <p>Protein</p>
-            <p>(g)</p>
+          <div className="list-items text-gray-500">
+            <div className="text-black">
+              <p>Protein</p>
+              <p>(g)</p>
+            </div>
             <Label className="flex">min.</Label>
             <Input
               type="number"
-              className="mb-3 min-w-[70px]"
+              className="flex mb-3 min-w-[110px] justify-end"
               value={formState.proteinMin}
               onChange={(e) => setFormState((prevState)=>({
                 ...prevState,
@@ -156,17 +158,19 @@ export default function Page() {
                 ...prevState,
                 proteinMax:parseInt(e.target.value),
               }))}
-            />
+              />
             {errors["protein.max"] && <p className="text-red-500">{errors["protein.max"]}</p>}
             {errors["protein"] && <p className="text-red-500">{errors["protein"]}</p>}
           </div>
-          <div className="list-items">
-            <p>Fat</p>
-            <p>(g)</p>
+          <div className="list-items text-gray-500">
+            <div className="text-black">
+              <p>Fat</p>
+              <p>(g)</p>
+            </div>
             <Label className="flex">min.</Label>
             <Input
               type="number"
-              className="mb-3 min-w-[56px]"
+              className="mb-3 min-w-[110px]"
               value={formState.fatMin}
               onChange={(e) => setFormState((prevState)=>({
                 ...prevState,
@@ -186,14 +190,16 @@ export default function Page() {
             {errors["fat.max"] && <p className="text-red-500">{errors["fat.max"]}</p>}
             {errors["fat"] && <p className="text-red-500">{errors["fat"]}</p>}
           </div>
-          <div className="list-items">
-            <p>Carbohydrates</p>
+          <div className="list-items text-gray-500 ">
+            <div className="text-black"><p>Carbohydrates</p>
             <p>(g)</p>
+            </div>
             <Label className="flex">min.</Label>
             <Input
               type="number"
               className="mb-3 min-w-[56px]"
               value={formState.carbMin}
+              
               onChange={(e) => setFormState((prevState)=>({
                 ...prevState,
                 carbMin:parseInt(e.target.value),
@@ -217,20 +223,19 @@ export default function Page() {
           Search
         </Button>
       </form>
-
-    <div>
-      {loading ? (
-        <>
-        <p>Loading...</p><div className="w-full max-w-full min-w-[250px] md:min-w-[300px] lg:min-w-[600px] xl:min-w-[900px] mt-10">
-        <Image
-          src={Food}
-          width={1000}
-          height={450}
-          alt="random food"
-          layout="responsive"
-        ></Image>
+        
       </div>
-        </>
+    <div className="flex justify-center px-[25%] mt-24">
+      {loading ? (
+      <div className=" list-item list-none text-center">
+        <p className="xl:text-center ">Insert your goal and search for your dream meal!</p>
+        <Image
+            src={Food}
+            alt="random food"
+            className="max-w-full mt-12"
+            sizes="150vw"
+          ></Image>
+      </div>
       ) : (
         <ul className="grid text-center text-2xl ">
           {recipes.map((recipe) => (
@@ -248,7 +253,7 @@ export default function Page() {
    
       <Sheet>
       <SheetTrigger asChild>
-        <Button className="fixed right-0 top-3 z-50" variant="outline">Directions</Button>
+        <Button className="fixed right-0 top-3 z-50 w-18" variant="outline">Directions</Button>
       </SheetTrigger>
       <SheetContent className="text-xl px-10 overflow-y-auto">
         <SheetHeader>
@@ -256,7 +261,7 @@ export default function Page() {
         </SheetHeader>
         <div className="chuj">
             <div>{}</div>
-            <div dangerouslySetInnerHTML={{ __html: instructions || '' }}></div>
+            <div className="list-items" dangerouslySetInnerHTML={{ __html: instructions || '' }}></div>
         </div>
       </SheetContent>
     </Sheet>

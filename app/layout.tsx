@@ -8,7 +8,6 @@ import {
 
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import HomeUnauth from "@/pages/HomeUnauth";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,7 +27,6 @@ export default function RootLayout({
       <body className={inter.className}>
       <SignedOut>
         <Navbar/>
-        <HomeUnauth/>
       </SignedOut>
       <SignedIn>
         <Navbar/>

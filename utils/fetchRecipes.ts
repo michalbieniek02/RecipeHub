@@ -1,3 +1,6 @@
+
+
+
 import axios from 'axios';
 
 interface Recipe {
@@ -45,10 +48,11 @@ interface FetchRecipesParams {
   offset?: number;
   number?: number;
 }
+const apiKey = process.env.NEXT_PUBLIC_SPOONACULAR_API_KEY;
+const baseUrl = 'https://api.spoonacular.com/recipes/complexSearch';
 
 export const fetchRecipes = async (params: FetchRecipesParams): Promise<Recipe[]> => {
-  const apiKey = process.env.NEXT_PUBLIC_SPOONACULAR_API_KEY;
-  const response = await axios.get('https://api.spoonacular.com/recipes/complexSearch', {
+  const response = await axios.get(baseUrl, {
     params: {
       ...params,
       apiKey,
@@ -58,8 +62,34 @@ export const fetchRecipes = async (params: FetchRecipesParams): Promise<Recipe[]
   return response.data.results;
 };
 
+export const fetchRecipesByName = async (name:string) => {
+  const response = await axios.get(`${baseUrl}?${name}`, {
+    params: {
+      apiKey,
+      addRecipeInformation: true,
+    },
+  });
+  return response.data.results;
+};
+
+export const fetchRecipesByIngredients = async (ingredients:string[]) => {
+  const includeIngredients = ingredients.join(',');
+  const url = `${baseUrl}?apiKey=${apiKey}&includeIngredients=${includeIngredients}`;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.results;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
 export const fetchRecipeById = async (id: number): Promise<Recipe> => {
-  const apiKey = process.env.NEXT_PUBLIC_SPOONACULAR_API_KEY;
   const response = await axios.get(`https://api.spoonacular.com/recipes/${id}/information`, {
     params: {
       apiKey,
