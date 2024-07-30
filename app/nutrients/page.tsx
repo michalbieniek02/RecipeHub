@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Food from "../../public/food.webp";
 import { fetchRecipes, fetchRecipeById  } from '../../utils/fetchRecipes';
+import { Recipe, Ingredient } from "../../utils/fetchRecipes";
 import {
     Sheet,
     SheetContent,
@@ -16,19 +17,6 @@ import {
   import { Label } from "@/components/ui/label"
 
 
-interface Ingredient {
-name: string;
-amount: string;
-}
-
-interface Recipe {
-  id: number;
-  title: string;
-  image: string;
-  summary?: string;
-  ingredients?: Ingredient[];
-  instructions?: string[];
-}
 
 const nutrientSchema = z.object({
   protein: z.object({
@@ -82,7 +70,6 @@ export default function Page() {
         setSelectedRecipe(recipe);
         setIngredients(recipe.ingredients||[])
         setInstructions(recipe.instructions||[])
-        
       };
 
     const handleSubmit = (e:any) => {
@@ -108,6 +95,7 @@ export default function Page() {
     }
 }
 };
+  
 
   const getRecipes = async () => {
     setLoading(true);
@@ -143,7 +131,7 @@ export default function Page() {
             <Input
               type="number"
               className="flex mb-3 min-w-[110px] justify-end"
-              value={formState.proteinMin}
+              placeholder="0"              
               onChange={(e) => setFormState((prevState)=>({
                 ...prevState,
                 proteinMin:parseInt(e.target.value),
@@ -153,7 +141,7 @@ export default function Page() {
             <Label className="flex">max.</Label>
             <Input
               type="number"
-              value={formState.proteinMax}
+              placeholder="999"
               onChange={(e) => setFormState((prevState)=>({
                 ...prevState,
                 proteinMax:parseInt(e.target.value),
@@ -171,7 +159,7 @@ export default function Page() {
             <Input
               type="number"
               className="mb-3 min-w-[110px]"
-              value={formState.fatMin}
+              placeholder="0"
               onChange={(e) => setFormState((prevState)=>({
                 ...prevState,
                 fatMin:parseInt(e.target.value),
@@ -181,7 +169,7 @@ export default function Page() {
             <Label className="flex">max.</Label>
             <Input
               type="number"
-              value={formState.fatMax}
+              placeholder="999"
               onChange={(e) => setFormState((prevState)=>({
                 ...prevState,
                 fatMax:parseInt(e.target.value),
@@ -198,8 +186,7 @@ export default function Page() {
             <Input
               type="number"
               className="mb-3 min-w-[56px]"
-              value={formState.carbMin}
-              
+              placeholder="0"              
               onChange={(e) => setFormState((prevState)=>({
                 ...prevState,
                 carbMin:parseInt(e.target.value),
@@ -209,7 +196,7 @@ export default function Page() {
             <Label className="flex">max.</Label>
             <Input
               type="number"
-              value={formState.carbMax}
+              placeholder="999"              
               onChange={(e) => setFormState((prevState)=>({
                 ...prevState,
                 carbMax:parseInt(e.target.value),
@@ -237,12 +224,12 @@ export default function Page() {
           ></Image>
       </div>
       ) : (
-        <ul className="grid text-center text-2xl ">
+        <ul className="grid text-center text-sm sm:text-xl md:text-2xl">
           {recipes.map((recipe) => (
             <li className="flex py-2 " key={recipe.id}>
-              <img className='min-w-[400px] rounded-md' src={recipe.image} alt={recipe.title} />
-              <div className="min-w-[90%] rounded-md bg-gray-100 shadow-md ml-4 p-2 pt-24">
-              <h2>{recipe.title}</h2>
+            <Image width={400} height={250} className=' rounded-md' src={recipe.image} alt={recipe.title} />
+            <div className="w-full rounded-md bg-gray-100 shadow-md ml-4 p-2 md:py-9">
+              <h2 className="mx-auto">{recipe.title}</h2>
               <button className="px-3 bg-white rounded-md border:white active:border-black border-solid border-2 " onClick={()=>openModal(recipe.id)}>Select</button>
               </div>
             </li>
@@ -250,7 +237,7 @@ export default function Page() {
         </ul>
       )}
     </div>
-   
+
       <Sheet>
       <SheetTrigger asChild>
         <Button className="fixed right-0 top-3 z-50 w-18" variant="outline">Directions</Button>
@@ -260,7 +247,12 @@ export default function Page() {
           <SheetTitle className="text-2xl text-purple-500 text-center my-10">{selectedRecipe?.title? selectedRecipe.title :"Choose your meal first!"}</SheetTitle>
         </SheetHeader>
         <div className="chuj">
-            <div>{}</div>
+        <div>Ingredients:</div>
+            <ul>
+              {selectedRecipe?.ingredients?.map((ingredient, idx) => (
+                <li key={idx}>{ingredient.name}: {ingredient.amount}</li>
+              ))}
+            </ul>
             <div className="list-items" dangerouslySetInnerHTML={{ __html: instructions || '' }}></div>
         </div>
       </SheetContent>

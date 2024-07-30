@@ -1,16 +1,17 @@
-
-
-
 import axios from 'axios';
 
-interface Recipe {
+export interface Recipe {
   id: number;
   title: string;
   image: string;
   summary?: string;
-  ingredients?: { name: string; amount: string }[];
+  ingredients?: Ingredient[];
   instructions?: string[];
 }
+export interface Ingredient {
+  name: string;
+  amount: string;
+  }
 
 interface FetchRecipesParams {
   query?: string;
@@ -62,9 +63,10 @@ export const fetchRecipes = async (params: FetchRecipesParams): Promise<Recipe[]
   return response.data.results;
 };
 
-export const fetchRecipesByName = async (name:string) => {
-  const response = await axios.get(`${baseUrl}?${name}`, {
+export const fetchRecipesByName = async (name: string) => {
+  const response = await axios.get(baseUrl, {
     params: {
+      query: name,
       apiKey,
       addRecipeInformation: true,
     },
@@ -72,21 +74,16 @@ export const fetchRecipesByName = async (name:string) => {
   return response.data.results;
 };
 
-export const fetchRecipesByIngredients = async (ingredients:string[]) => {
+export const fetchRecipesByIngredients = async (ingredients: string[]) => {
   const includeIngredients = ingredients.join(',');
-  const url = `${baseUrl}?apiKey=${apiKey}&includeIngredients=${includeIngredients}`;
-
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Error: ${response.statusText}`);
-    }
-    const data = await response.json();
-    return data.results;
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
+  const response = await axios.get(baseUrl, {
+    params: {
+      includeIngredients,
+      apiKey,
+      addRecipeInformation: true,
+    },
+  });
+  return response.data.results;
 };
 
 export const fetchRecipeById = async (id: number): Promise<Recipe> => {
