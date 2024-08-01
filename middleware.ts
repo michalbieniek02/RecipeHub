@@ -1,7 +1,1 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
-
-export default clerkMiddleware();
-
-export const config = {
-  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)","/((?!_next|api/healthcheck).*)"],
-};
+export { auth as middleware } from "@/auth"

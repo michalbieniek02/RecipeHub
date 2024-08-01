@@ -127,7 +127,7 @@ export default function Page() {
               <p>Protein</p>
               <p>(g)</p>
             </div>
-            <Label className="flex">min.</Label>
+            <Label className="flex mb-1">min.</Label>
             <Input
               type="number"
               className="flex mb-3 min-w-[110px] justify-end"
@@ -138,7 +138,7 @@ export default function Page() {
               }))}
             />
             {errors["protein.min"] && <p className="text-red-500">{errors["protein.min"]}</p>}
-            <Label className="flex">max.</Label>
+            <Label className="flex mb-1">max.</Label>
             <Input
               type="number"
               placeholder="999"
@@ -155,7 +155,7 @@ export default function Page() {
               <p>Fat</p>
               <p>(g)</p>
             </div>
-            <Label className="flex">min.</Label>
+            <Label className="flex mb-1">min.</Label>
             <Input
               type="number"
               className="mb-3 min-w-[110px]"
@@ -166,7 +166,7 @@ export default function Page() {
               }))}
             />
             {errors["fat.min"] && <p className="text-red-500">{errors["fat.min"]}</p>}
-            <Label className="flex">max.</Label>
+            <Label className="flex mb-1">max.</Label>
             <Input
               type="number"
               placeholder="999"
@@ -182,7 +182,7 @@ export default function Page() {
             <div className="text-black"><p>Carbohydrates</p>
             <p>(g)</p>
             </div>
-            <Label className="flex">min.</Label>
+            <Label className="flex mb-1">min.</Label>
             <Input
               type="number"
               className="mb-3 min-w-[56px]"
@@ -193,7 +193,7 @@ export default function Page() {
               }))}
             />
             {errors["carbs.min"] && <p className="text-red-500">{errors["carbs.min"]}</p>}
-            <Label className="flex">max.</Label>
+            <Label className="flex mb-1">max.</Label>
             <Input
               type="number"
               placeholder="999"              

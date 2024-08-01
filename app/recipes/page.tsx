@@ -4,9 +4,8 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { fetchRecipesByName, fetchRecipesByIngredients, fetchRecipeById } from '../../utils/fetchRecipes';
 import Food from "../../public/food.webp";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Recipe } from "../../utils/fetchRecipes";
-import { Ingredient } from "../nutrients/page";
 import {
   Sheet,
   SheetContent,
@@ -22,7 +21,6 @@ export default function Page() {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [ingredients, setIngredients] = useState("");
   const [instructions, setInstructions] = useState<string[]>([]);
-  let recipeIng:Ingredient[];
 
   const handleRecipeSubmit = async (e:any) => {
     e.preventDefault(); 
@@ -43,7 +41,6 @@ export default function Page() {
     const recipe = await fetchRecipeById(recipeId);
     setSelectedRecipe(recipe);
     setInstructions(recipe.instructions||[])
-    console.log(recipeIng);
     
   };
 
@@ -87,7 +84,7 @@ export default function Page() {
         {loading ? <Image src={Food} width={1000} height={450} className="mt-10" alt="random food" /> : <></>}
 
       <Sheet>
-      <SheetTrigger asChild>
+      <SheetTrigger >
         <Button className="fixed right-0 top-3 z-50 w-18" variant="outline">Directions</Button>
       </SheetTrigger>
       <SheetContent className="text-xl px-10 overflow-y-auto">
