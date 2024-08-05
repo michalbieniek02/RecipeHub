@@ -1,12 +1,14 @@
 'use client';
+import Image from "next/image";
+import Food from "../../public/food.webp";
 import { useState } from "react";
 import { z, ZodError } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
-import Food from "../../public/food.webp";
 import { fetchRecipes, fetchRecipeById  } from '../../utils/fetchRecipes';
-import { Recipe, Ingredient } from "../../utils/fetchRecipes";
+import { Recipe } from "../../utils/fetchRecipes";
+import { useSession } from "next-auth/react";
+import Unauthorized from "@/components/Unauthorized";
 import {
     Sheet,
     SheetContent,
@@ -15,8 +17,6 @@ import {
     SheetTrigger,
   } from "@/components/ui/sheet"
   import { Label } from "@/components/ui/label"
-
-
 
 const nutrientSchema = z.object({
   protein: z.object({
@@ -42,7 +42,6 @@ const nutrientSchema = z.object({
   }),
 });
 
-
 type NutrientFormData = z.infer<typeof nutrientSchema>;
 type Errors = Record<string, string>;
 
@@ -56,19 +55,15 @@ export default function Page() {
         carbMax:997
     })
   
-    
     const [errors, setErrors] = useState<Errors>({});
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-    const [ingredients, setIngredients] = useState<Ingredient[]>([]);
     const [instructions, setInstructions] = useState<string[]>([]);
     
-
     const openModal = async (recipeId: number) => {
         const recipe = await fetchRecipeById(recipeId);
         setSelectedRecipe(recipe);
-        setIngredients(recipe.ingredients||[])
         setInstructions(recipe.instructions||[])
       };
 
@@ -83,7 +78,6 @@ export default function Page() {
         try {
             nutrientSchema.parse(formData);
       setErrors({});
-      console.log(formData);
     } catch (e) {
       if (e instanceof ZodError) {
         const errorObject = e.errors.reduce((acc, curr) => {
@@ -92,11 +86,10 @@ export default function Page() {
           return acc;
         }, {} as Errors);
         setErrors(errorObject);
+      }
     }
-}
-};
+  };
   
-
   const getRecipes = async () => {
     setLoading(true);
     const params = {
@@ -113,8 +106,10 @@ export default function Page() {
     setLoading(false);
   };
 
+  const {data:session} = useSession()
+
   return (
-    <main>
+    session?(<main>
       <div className="grid grid-cols-1 xl:grid-cols-2 xl:gap-10 px-[10%] md:px-[20%]  lg:px-[25%] text-center xl:text-start justify-center items-center "> 
       <div className="list-item list-none mt-[200px]">
         <h1 className="text-5xl sm:text-7xl"> Nutrients</h1>
@@ -137,7 +132,7 @@ export default function Page() {
                 proteinMin:parseInt(e.target.value),
               }))}
             />
-            {errors["protein.min"] && <p className="text-red-500">{errors["protein.min"]}</p>}
+            {errors["protein.min"] && <p className="text-red-500 text-xs">{errors["protein.min"]}</p>}
             <Label className="flex mb-1">max.</Label>
             <Input
               type="number"
@@ -147,8 +142,8 @@ export default function Page() {
                 proteinMax:parseInt(e.target.value),
               }))}
               />
-            {errors["protein.max"] && <p className="text-red-500">{errors["protein.max"]}</p>}
-            {errors["protein"] && <p className="text-red-500">{errors["protein"]}</p>}
+            {errors["protein.max"] && <p className="text-red-500 text-xs">{errors["protein.max"]}</p>}
+            {errors["protein"] && <p className="text-red-500 text-xs">{errors["protein"]}</p>}
           </div>
           <div className="list-items text-gray-500">
             <div className="text-black">
@@ -165,7 +160,7 @@ export default function Page() {
                 fatMin:parseInt(e.target.value),
               }))}
             />
-            {errors["fat.min"] && <p className="text-red-500">{errors["fat.min"]}</p>}
+            {errors["fat.min"] && <p className="text-red-500 text-xs">{errors["fat.min"]}</p>}
             <Label className="flex mb-1">max.</Label>
             <Input
               type="number"
@@ -175,8 +170,8 @@ export default function Page() {
                 fatMax:parseInt(e.target.value),
               }))}
             />
-            {errors["fat.max"] && <p className="text-red-500">{errors["fat.max"]}</p>}
-            {errors["fat"] && <p className="text-red-500">{errors["fat"]}</p>}
+            {errors["fat.max"] && <p className="text-red-500 text-xs">{errors["fat.max"]}</p>}
+            {errors["fat"] && <p className="text-red-500 text-xs">{errors["fat"]}</p>}
           </div>
           <div className="list-items text-gray-500 ">
             <div className="text-black"><p>Carbohydrates</p>
@@ -202,8 +197,8 @@ export default function Page() {
                 carbMax:parseInt(e.target.value),
               }))}
             />
-            {errors["carbs.max"] && <p className="text-red-500">{errors["carbs.max"]}</p>}
-            {errors["carbs"] && <p className="text-red-500">{errors["carbs"]}</p>}
+            {errors["carbs.max"] && <p className="text-red-500 text-xs">{errors["carbs.max"]}</p>}
+            {errors["carbs"] && <p className="text-red-500 text-xs">{errors["carbs"]}</p>}
           </div>
         </div>
         <Button className="mt-5 bg-purple-600" type="submit">
@@ -227,10 +222,17 @@ export default function Page() {
         <ul className="grid text-center text-sm sm:text-xl md:text-2xl">
           {recipes.map((recipe) => (
             <li className="flex py-2 " key={recipe.id}>
-            <Image width={400} height={250} className=' rounded-md' src={recipe.image} alt={recipe.title} />
+            <div className="w-full h-full  max-w-[400px] max-h-[250px] overflow-hidden rounded-md">
+              <Image 
+                width={400} 
+                height={250} 
+                className='object-cover lg:w-[120%] lg:h-[120%] ' 
+                src={recipe.image} 
+                alt={recipe.title} />
+            </div>
             <div className="w-full rounded-md bg-gray-100 shadow-md ml-4 p-2 md:py-9">
               <h2 className="mx-auto">{recipe.title}</h2>
-              <button className="px-3 bg-white rounded-md border:white active:border-black border-solid border-2 " onClick={()=>openModal(recipe.id)}>Select</button>
+              <button className="px-3 text-sm  bg-white rounded-md border:white active:border-black border-solid border-2 " onClick={()=>openModal(recipe.id)}>Select</button>
               </div>
             </li>
           ))}
@@ -246,8 +248,8 @@ export default function Page() {
         <SheetHeader>
           <SheetTitle className="text-2xl text-purple-500 text-center my-10">{selectedRecipe?.title? selectedRecipe.title :"Choose your meal first!"}</SheetTitle>
         </SheetHeader>
-        <div className="chuj">
-        <div>Ingredients:</div>
+        <div>
+        <h1>Ingredients:</h1>
             <ul>
               {selectedRecipe?.ingredients?.map((ingredient, idx) => (
                 <li key={idx}>{ingredient.name}: {ingredient.amount}</li>
@@ -258,6 +260,5 @@ export default function Page() {
       </SheetContent>
     </Sheet>
       
-    </main>
-  );
-}
+    </main>):<Unauthorized/>
+)}

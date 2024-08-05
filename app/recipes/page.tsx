@@ -13,6 +13,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { useSession } from "next-auth/react";
+import Unauthorized from "@/components/Unauthorized";
 
 export default function Page() {
   const [recipeName, setRecipeName] = useState("");
@@ -43,11 +45,11 @@ export default function Page() {
     setInstructions(recipe.instructions||[])
     
   };
-
+  const {data:session} = useSession()
 
 
   return (
-    <main className='px-[10%] md:px-[20%] lg:px-[30%] text-center xl:text-start justify-center items-center pt-[200px]'>
+    session?(<main className='px-[10%] md:px-[20%] lg:px-[30%] text-center xl:text-start justify-center items-center pt-[200px]'>
       <div className="grid grid-cols-1 xl:grid-cols-2">
 
       
@@ -69,16 +71,24 @@ export default function Page() {
       </div>
 
     <div className="grid text-center text-sm sm:text-xl md:text-2xl">
-      {recipes.map((recipe: Recipe, index) => (
+      {recipes.map((recipe: Recipe) => (
         <li className="flex py-2 " key={recipe.id}>
-          <Image width={400} height={250} className=' rounded-md' src={recipe.image} alt={recipe.title} />
+          <div className="w-full h-full max-w-[400px] max-h-[250px] overflow-hidden rounded-md">
+            <Image 
+              width={400} 
+              height={250} 
+              className='object-cover w-[120%] h-[120%] ' 
+              src={recipe.image} 
+              alt={recipe.title} />
+          </div>
           <div className="w-full rounded-md bg-gray-100 shadow-md ml-4 p-2 md:py-9">
-          <h2 className="mx-auto">{recipe.title}</h2>
-          <button className="px-3 bg-white rounded-md border:white active:border-black border-solid border-2 " onClick={()=>openModal(recipe.id)}>Select</button>
+          <h2 className="mx-auto text-sm md:text-xl">{recipe.title}</h2>
+          <button className="px-3 text-sm  bg-white rounded-md border:white active:border-black border-solid border-2 " onClick={()=>openModal(recipe.id)}>Select</button>
           </div>
       </li>
         ))}
     </div>
+    
 
        
         {loading ? <Image src={Food} width={1000} height={450} className="mt-10" alt="random food" /> : <></>}
@@ -91,14 +101,13 @@ export default function Page() {
         <SheetHeader>
           <SheetTitle className="text-2xl text-purple-500 text-center my-10">{selectedRecipe?.title? selectedRecipe.title :"Choose your meal first!"}</SheetTitle>
         </SheetHeader>
-        <div className="chuj">
+        <div className=">_<">
             <div className="list-items" dangerouslySetInnerHTML={{ __html: instructions || '' }}></div>
-            
         </div>
       </SheetContent>
     </Sheet>
     </main>
-
+):<Unauthorized/>
     
   );
 }

@@ -1,6 +1,5 @@
 'use client';
-
-import { SignInButton } from "@/app/pages/signInButton";
+import SignInButton from "./SignInButton";
 import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { useState } from 'react';
@@ -14,21 +13,13 @@ export default function Navbar() {
     setIsNavOpen(!isNavOpen);
   }
 
-  function getUserInfo(session:any){
-    return {
-      name: session?.user?.name,
-      email: session?.user?.email,
-      image: session?.user?.image
-    }
-  }
-
   return (
     <>
       <div className="hidden sm:block">
         <nav className="fixed top-0 flex px-[20%] md:px-[25%] lg:px-[30%] shadow bg-white opacity-85 h-16 w-[100%] justify-between items-center font-semibold text-xl">
           <Link href={'/'}>
-            <div className="inline-flex">
-              <p>Re</p><p className='text-purple-600'>cipe</p><p>Hub</p> 
+            <div className="inline-flex" translate="no">
+            Re<span className="text-purple-600" translate="no">cipe</span>Hub            
             </div>
           </Link>
           <Link href={'/recipes'}><Button variant='link'>Recipes</Button></Link> 
@@ -39,15 +30,14 @@ export default function Navbar() {
                 {session.user?.name || session.user?.email} ▼
               </Button>
               {isNavOpen && (
-                <div className="absolute -right-3 w-48 bg-white opacity-85 border border-gray-200 rounded-md shadow-lg mt-3">
+                <div className="absolute right-0 w-48 bg-white opacity-85 border border-gray-200 rounded-md shadow-lg mt-">
                   <Link href="/profile"><Button variant='link'>Profile</Button></Link>
                   <Button variant='link' onClick={() => signOut()}>Sign out</Button>
                 </div>
               )}
             </div>
-          ) : (
-            <SignInButton />
-          )}
+          ) : <SignInButton />
+          }
         </nav>
       </div>
       

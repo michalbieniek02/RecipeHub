@@ -1,14 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {images: {
-      remotePatterns: [
-        {
-          protocol: 'https',
-          hostname: 'img.spoonacular.com',
-          port: '',
-          pathname: '/recipes/**',
-        },
-      ],
-    },};
+      domains: ['lh3.googleusercontent.com','img.spoonacular.com'],
+    },
+  };
 
 export default nextConfig;
 
